@@ -1,10 +1,7 @@
 package Controller;
 
 import Model.Garantie;
-import io.micrometer.core.instrument.util.StringUtils;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
