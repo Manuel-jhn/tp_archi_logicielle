@@ -1,6 +1,9 @@
 package Controller;
 
 import Model.Garantie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
 
 
 import javax.validation.Valid;
@@ -10,6 +13,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 public class GarantieController {
@@ -24,8 +28,8 @@ public class GarantieController {
 
 
     @PostMapping("/garantie")
-    public ResponseEntity<Garantie> créerGarantie(@RequestParam("nom") String nom, @RequestParam("montant") float montant, @RequestParam("description") String description,) {
-        if (StringUtils.isBlank(nom)) {
+    public ResponseEntity<Garantie> creerGarantie(@RequestParam("nom") String nom, @RequestParam("montant") float montant, @RequestParam("description") String description) {
+        if (StringUtils.isEmpty(nom)) {
             return ResponseEntity.status(400).build();
         }
 
