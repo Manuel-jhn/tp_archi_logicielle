@@ -27,26 +27,28 @@ public class GarantieController {
 
 
     @PostMapping("/garantie")
-    public ResponseEntity<Equipe> postEquipe(@RequestParam("name") String name) {
-        if (StringUtils.isBlank(name)) {
+    public ResponseEntity<Garantie> créerGarantie(@RequestParam("nom") String nom, @RequestParam("montant") float montant, @RequestParam("description") String description,) {
+        if (StringUtils.isBlank(nom)) {
             return ResponseEntity.status(400).build();
         }
 
         // affectation d'un id et persistance
-        Equipe equipe = new Equipe();
-        equipe.setId(fakeSeq.incrementAndGet());
-        equipe.setName(name);
-        fakeDb.put(equipe.getId(), equipe);
+        Garantie garantie = new Garantie();
+        garantie.setId(fakeSeq.incrementAndGet());
+        garantie.setNom(nom);
+        garantie.setMontant(montant);
+        garantie.setDescription(description);
+        fakeDb.put(garantie.getId(), garantie);
 
         // URI de localisation de la ressource
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").build(equipe.getId());
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").build(garantie.getId());
 
         // réponse 201 avec la localisation et la ressource créée
-        return ResponseEntity.created(location).body(equipe);
+        return ResponseEntity.created(location).body(garantie);
     }
 
-    @GetMapping("/equipes/{id}")
-    public ResponseEntity<Equipe> getEquipe(@PathVariable("id") @NotNull int id) {
+    @GetMapping("api/garantie/{id}")
+    public ResponseEntity<Garantie> getGarantie(@PathVariable("id") @NotNull int id) {
         if (fakeDb.containsKey(id)) {
             return ResponseEntity.ok(fakeDb.get(id));
         }
@@ -54,13 +56,13 @@ public class GarantieController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/equipes")
-    public ResponseEntity<Collection<Equipe>> getEquipes() {
+    @GetMapping("api/garantie")
+    public ResponseEntity<Collection<Garantie>> getGaranties() {
         return ResponseEntity.ok().body(fakeDb.values());
     }
 
-    @DeleteMapping("/equipes/{id}")
-    public ResponseEntity<Equipe> deleteEquipe(@PathVariable("id") @NotNull int id) {
+    @DeleteMapping("api/garantie/{id}")
+    public ResponseEntity<Garantie> deleteEquipe(@PathVariable("id") @NotNull int id) {
         if (fakeDb.containsKey(id)) {
             fakeDb.remove(id);
             return ResponseEntity.noContent().build();
@@ -69,23 +71,23 @@ public class GarantieController {
         return ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/equipes/{id}")
-    public ResponseEntity<Equipe> putEquipe(@PathVariable("id") @NotNull int id, @RequestBody @Valid Equipe equipe) {
+    @PutMapping("api/garantie/{id}")
+    public ResponseEntity<Garantie> putGarantie(@PathVariable("id") @NotNull int id, @RequestBody @Valid Garantie garantie) {
         if (fakeDb.containsKey(id)) {
-            // cas équipe existante, mise à jour
-            equipe.setId(id);
-            fakeDb.put(id, equipe);
+            // si garantie existante, mise à jour
+            garantie.setId(id);
+            fakeDb.put(id, garantie);
 
             return ResponseEntity.ok().build();
         } else {
-            // cas équipe inexistante, création
+            // si garantie inexistante, création
 
             // affectation d'un id et persistance
-            equipe.setId(fakeSeq.incrementAndGet());
-            fakeDb.put(equipe.getId(), equipe);
+            garantie.setId(fakeSeq.incrementAndGet());
+            fakeDb.put(garantie.getId(), garantie);
 
             // URI de localisation de la ressource
-            URI location = ServletUriComponentsBuilder.fromCurrentRequest().build(equipe.getId());
+            URI location = ServletUriComponentsBuilder.fromCurrentRequest().build(garantie.getId());
 
             // réponse 202 avec la localisation et la ressource créée
             return ResponseEntity.created(location).build();
