@@ -1,5 +1,6 @@
 package fr.ensim.archi.archirest.controller;
 
+import fr.ensim.archi.archirest.Base_de_donnees;
 import fr.ensim.archi.archirest.model.Garantie;
 import io.micrometer.core.instrument.util.StringUtils;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RestController
 public class GarantieRestController {
 
-    // Simulation d'une persistence de notre ressource en attribut d'instance
-    // pour simplifier le TP. Bien évidemment, on ne fait pas ça en temps normal
-    // ... car c'est stateful ! Une base de données serait plus adaptée !
-    private Map<Integer, Garantie> fakeDb = new ConcurrentHashMap<Integer, Garantie>();
+
+    Base_de_donnees database = new Base_de_donnees();
 
     // Simulation d'un séquenceur pour générer l'identifiant des équipes
     private AtomicInteger fakeSeq = new AtomicInteger(0);
@@ -38,7 +37,7 @@ public class GarantieRestController {
         garantie.setNom(nom);
         garantie.setMontant(montant);
         garantie.setDescription(description);
-        fakeDb.put(garantie.getId(), garantie);
+        database.getDatabase().put(garantie.getId(), garantie);
 
         // URI de localisation de la ressource
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").build(garantie.getId());
@@ -49,8 +48,8 @@ public class GarantieRestController {
 
     @GetMapping("api/garantie/{id}")
     public ResponseEntity<Garantie> getGarantie(@PathVariable("id") @NotNull int id) {
-        if (fakeDb.containsKey(id)) {
-            return ResponseEntity.ok(fakeDb.get(id));
+        if (database.getDatabase().containsKey(id)) {
+            return ResponseEntity.ok(database.getDatabase().get(id));
         }
 
         return ResponseEntity.notFound().build();
@@ -58,13 +57,13 @@ public class GarantieRestController {
 
     @GetMapping("api/garantie")
     public ResponseEntity<Collection<Garantie>> getGaranties() {
-        return ResponseEntity.ok().body(fakeDb.values());
+        return ResponseEntity.ok().body(database.getDatabase().values());
     }
 
     @DeleteMapping("api/garantie/{id}")
     public ResponseEntity<Garantie> deleteGarantie(@PathVariable("id") @NotNull int id) {
-        if (fakeDb.containsKey(id)) {
-            fakeDb.remove(id);
+        if (database.getDatabase().containsKey(id)) {
+            database.getDatabase().remove(id);
             return ResponseEntity.noContent().build();
         }
 
@@ -73,10 +72,10 @@ public class GarantieRestController {
 
     @PutMapping("api/garantie/{id}")
     public ResponseEntity<Garantie> putGarantie(@PathVariable("id") @NotNull int id, @RequestBody @Valid Garantie garantie) {
-        if (fakeDb.containsKey(id)) {
+        if (database.getDatabase().containsKey(id)) {
             // si garantie existante, mise à jour
             garantie.setId(id);
-            fakeDb.put(id, garantie);
+            database.getDatabase().put(id, garantie);
 
             return ResponseEntity.ok().build();
         } else {
@@ -84,7 +83,7 @@ public class GarantieRestController {
 
             // affectation d'un id et persistance
             garantie.setId(fakeSeq.incrementAndGet());
-            fakeDb.put(garantie.getId(), garantie);
+            database.getDatabase().put(garantie.getId(), garantie);
 
             // URI de localisation de la ressource
             URI location = ServletUriComponentsBuilder.fromCurrentRequest().build(garantie.getId());
